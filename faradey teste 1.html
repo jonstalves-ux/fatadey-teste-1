@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Manual do Jogador — Faradey</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Georgia,serif;background:#1a1410;color:#e8dcc4;line-height:1.6}
+  header{background:linear-gradient(180deg,#2a1f15,#1a1410);padding:40px 20px;text-align:center;border-bottom:2px solid #8b6f3e}
+  header h1{font-size:2.5em;letter-spacing:8px;color:#d4af6a}
+  header p{color:#a8957a;margin-top:8px;font-style:italic}
+  nav{background:#0f0b08;padding:12px;position:sticky;top:0;z-index:100;border-bottom:1px solid #8b6f3e}
+  nav ul{list-style:none;display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+  nav button{background:transparent;color:#d4af6a;border:1px solid #8b6f3e;padding:8px 16px;cursor:pointer;font-family:inherit;letter-spacing:2px;transition:all .2s}
+  nav button:hover,nav button.active{background:#8b6f3e;color:#1a1410}
+  main{max-width:1200px;margin:0 auto;padding:30px 20px 100px}
+  section{display:none}
+  section.active{display:block}
+  h2{color:#d4af6a;border-bottom:1px solid #8b6f3e;padding-bottom:8px;margin-bottom:20px;letter-spacing:3px}
+  h3{color:#c49a5a;margin:20px 0 10px}
+  .card{background:#251b13;border:1px solid #5a4528;padding:20px;margin-bottom:16px;border-radius:4px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .ficha-row{display:grid;grid-template-columns:2fr 1fr 1.5fr 1fr;gap:10px;margin-bottom:12px}
+  .ficha-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+  .stat-box{background:#1a1410;border:1px solid #5a4528;padding:8px;text-align:center;border-radius:4px}
+  .stat-box label{display:block;font-size:.75em;color:#a8957a;letter-spacing:2px;margin-bottom:4px}
+  .stat-box input{width:100%;background:transparent;border:none;border-bottom:1px solid #5a4528;color:#d4af6a;text-align:center;font-size:1.3em;font-family:inherit}
+  input[type=text],input[type=number],textarea,select{width:100%;background:#1a1410;border:1px solid #5a4528;color:#e8dcc4;padding:8px;font-family:inherit;border-radius:3px}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:#d4af6a}
+  label.field-label{display:block;font-size:.8em;color:#a8957a;letter-spacing:2px;margin-bottom:4px}
+  textarea{min-height:70px;resize:vertical}
+  .attr-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:16px 0}
+  .attr-circle{background:#1a1410;border:2px solid #5a4528;border-radius:50%;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px}
+  .attr-circle label{font-size:.7em;color:#a8957a;letter-spacing:1px}
+  .attr-circle input{width:60%;background:transparent;border:none;color:#d4af6a;text-align:center;font-size:1.4em;font-family:inherit}
+  .magia-tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:1px solid #5a4528;flex-wrap:wrap}
+  .magia-tab{background:transparent;color:#a8957a;border:1px solid #5a4528;border-bottom:none;padding:10px 20px;cursor:pointer;font-family:inherit;letter-spacing:2px}
+  .magia-tab.active{background:#8b6f3e;color:#1a1410}
+  .magia-content{display:none}
+  .magia-content.active{display:block}
+  .dynamic-table{width:100%;border-collapse:collapse;margin-top:10px}
+  .dynamic-table th,.dynamic-table td{border:1px solid #5a4528;padding:6px;text-align:left;font-size:.9em}
+  .dynamic-table th{background:#2a1f15;color:#d4af6a;letter-spacing:1px}
+  .dynamic-table input{background:transparent;border:none;color:#e8dcc4;width:100%;padding:2px}
+  .btn{background:#8b6f3e;color:#1a1410;border:none;padding:8px 16px;cursor:pointer;font-family:inherit;letter-spacing:2px;margin-top:10px;border-radius:3px}
+  .btn:hover{background:#d4af6a}
+  .btn-small{padding:4px 10px;font-size:.8em;margin:0}
+  .btn-danger{background:#6a2a2a;color:#e8dcc4}
+  .classe-card{background:#251b13;border-left:4px solid #d4af6a;padding:20px;margin-bottom:20px}
+  .classe-card h3{color:#d4af6a;margin-bottom:8px}
+  .tag{display:inline-block;background:#8b6f3e;color:#1a1410;padding:2px 10px;border-radius:12px;font-size:.75em;letter-spacing:1px;margin-right:6px;margin-bottom:4px}
+  .exemplo{background:#0f0b08;border-left:3px solid #c49a5a;padding:14px;margin-top:12px;font-style:italic;color:#c8b89a}
+  .exemplo strong{color:#d4af6a;font-style:normal}
+  .actions{position:fixed;bottom:20px;right:20px;display:flex;gap:8px;z-index:200}
+  .raca-card{background:#251b13;border:1px solid #5a4528;padding:16px;margin-bottom:12px;border-radius:4px}
+  .raca-card h3{margin-top:0}
+  .raca-stats{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;font-size:.9em;color:#a8957a}
+  .raca-stats span strong{color:#d4af6a}
+  @media (max-width:768px){
+    .grid-2,.grid-3,.ficha-row{grid-template-columns:1fr}
+    .ficha-stats{grid-template-columns:repeat(2,1fr)}
+    .attr-grid{grid-template-columns:repeat(3,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>✦ FARADEY ✦</h1>
+  <p>Manual do Jogador — Continente de Calon</p>
+</header>
+
+<nav>
+  <ul>
+    <li><button onclick="show('ficha',this)" class="active">FICHA</button></li>
+    <li><button onclick="show('magia',this)">MAGIA</button></li>
+    <li><button onclick="show('classes',this)">CLASSES</button></li>
+    <li><button onclick="show('racas',this)">RAÇAS</button></li>
+    <li><button onclick="show('guildas',this)">GUILDAS</button></li>
+    <li><button onclick="show('exemplos',this)">COMO JOGAR</button></li>
+  </ul>
+</nav>
+
+<main>
+
+<!-- ============ FICHA ============ -->
+<section id="ficha" class="active">
+  <h2>FICHA DO PERSONAGEM</h2>
+
+  <div class="card">
+    <div class="ficha-row">
+      <div><label class="field-label">NOME</label><input type="text" data-f="nome"></div>
+      <div><label class="field-label">RAÇA</label>
+        <select data-f="raca">
+          <option value="">—</option>
+          <option>Valdrim</option><option>Korvathi</option><option>Serelith</option>
+          <option>Drakorim</option><option>Umbralith</option><option>Thalassari</option>
+          <option>Petranos</option><option>Faelkin</option><option>Orosthai</option>
+          <option>Cinzath</option>
+        </select>
+      </div>
+      <div><label class="field-label">CLASSE & NÍVEL</label><input type="text" data-f="classe"></div>
+      <div><label class="field-label">EXP</label><input type="number" data-f="exp" value="0"></div>
+    </div>
+
+    <div class="ficha-stats">
+      <div class="stat-box"><label>VIDA</label><input type="number" data-f="vida"></div>
+      <div class="stat-box"><label>MANA</label><input type="number" data-f="mana"></div>
+      <div class="stat-box"><label>EVASÃO</label><input type="number" data-f="evasao"></div>
+      <div class="stat-box"><label>DEFESA</label><input type="number" data-f="defesa"></div>
+      <div class="stat-box"><label>DESLOC.</label><input type="number" data-f="desloc"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Atributos Principais</h3>
+    <div class="attr-grid">
+      <div class="attr-circle"><input type="number" data-f="for"><label>FOR</label></div>
+      <div class="attr-circle"><input type="number" data-f="des"><label>DES</label></div>
+      <div class="attr-circle"><input type="number" data-f="int"><label>INT</label></div>
+      <div class="attr-circle"><input type="number" data-f="esp"><label>ESP</label></div>
+      <div class="attr-circle"><input type="number" data-f="vig"><label>VIG</label></div>
+      <div class="attr-circle"><input type="number" data-f="car"><label>CAR</label></div>
+    </div>
+    <h3>Atributos Secundários</h3>
+    <div class="attr-grid">
+      <div class="attr-circle"><input type="number" data-f="sor"><label>SOR</label></div>
+      <div class="attr-circle"><input type="number" data-f="mor"><label>MOR</label></div>
+      <div class="attr-circle"><input type="number" data-f="fe"><label>FÉ</label></div>
+      <div class="attr-circle"><input type="number" data-f="per"><label>PER</label></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Ataques</h3>
+      <table class="dynamic-table" id="tbl-ataques">
+        <thead><tr><th>Nome</th><th>Dado</th><th>Treino</th><th>Tipo</th><th>Alcance</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn btn-small" onclick="addRow('tbl-ataques',5)">+ Adicionar</button>
+    </div>
+    <div class="card">
+      <h3>Equipamentos</h3>
+      <textarea data-f="equip" placeholder="Liste seus equipamentos..."></textarea>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Perícias</h3>
+      <table class="dynamic-table" id="tbl-pericias">
+        <thead><tr><th>Perícia</th><th>Bônus</th><th>Aptidão</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn btn-small" onclick="addRow('tbl-pericias',3)">+ Adicionar</button>
+    </div>
+    <div class="card">
+      <h3>Conhecimentos & Afinidades</h3>
+      <label class="field-label">Conhecimentos</label>
+      <textarea data-f="conhec"></textarea>
+      <label class="field-label" style="margin-top:10px">Lista de Afinidades</label>
+      <textarea data-f="afin"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Efeitos Temporários</h3>
+    <textarea data-f="efeitos" placeholder="Buffs, debuffs, condições..."></textarea>
+  </div>
+
+  <div class="card">
+    <h3>Origem & História</h3>
+    <textarea data-f="origem" style="min-height:120px" placeholder="De onde vem seu personagem? O que o move?"></textarea>
+  </div>
+</section>
+
+<!-- ============ MAGIA ============ -->
+<section id="magia">
+  <h2>MAGIA</h2>
+  <p style="margin-bottom:20px;color:#a8957a;font-style:italic">A mana não é um dom — é uma linguagem. Três caminhos para falá-la.</p>
+
+  <div class="magia-tabs">
+    <button class="magia-tab active" onclick="showMagia('phewinnd',this)">PHEWINND</button>
+    <button class="magia-tab" onclick="showMagia('conjuro',this)">CONJURO</button>
+    <button class="magia-tab" onclick="showMagia('encantamento',this)">ENCANTAMENTO</button>
+  </div>
+
+  <div id="phewinnd" class="magia-content active">
+    <div class="card">
+      <h3>Phewinnd — A Escuta</h3>
+      <p>O caminho do <strong>ouvir</strong>. Phewinnd não impõe à mana — interpreta seus sussurros. É a arte da percepção expandida, da ilusão, da leitura de fluxos invisíveis. Ouvir antes de agir é sua máxima.</p>
+      <p style="margin-top:10px"><strong>Atributo principal:</strong> Esp · <strong>Custo base:</strong> 2 mana/efeito menor · <strong>Risco:</strong> sobrecarga sensorial (rolagem em Mor)</p>
+    </div>
+    <div class="card">
+      <h3>Suas Magias de Phewinnd</h3>
+      <table class="dynamic-table" id="tbl-phewinnd">
+        <thead><tr><th>Nome</th><th>Custo</th><th>Alcance</th><th>Efeito</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn btn-small" onclick="addRow('tbl-phewinnd',4)">+ Adicionar</button>
+    </div>
+  </div>
+
+  <div id="conjuro" class="magia-content">
+    <div class="card">
+      <h3>Conjuro — A Imposição</h3>
+      <p>O caminho do <strong>forçar</strong>. Conjuro arranca mana do ambiente e a molda em forma bruta — fogo, raio, água, força. Direto, devastador, caro. Quem conjura paga em fadiga e, às vezes, em pedaços de si mesmo.</p>
+      <p style="margin-top:10px"><strong>Atributo principal:</strong> Int · <strong>Custo base:</strong> 3 mana/efeito menor · <strong>Risco:</strong> recuo elemental (1d4 dano do próprio elemento se falhar)</p>
+    </div>
+    <div class="card">
+      <h3>Suas Magias de Conjuro</h3>
+      <table class="dynamic-table" id="tbl-conjuro">
+        <thead><tr><th>Nome</th><th>Custo</th><th>Dado</th><th>Elemento</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn btn-small" onclick="addRow('tbl-conjuro',4)">+ Adicionar</button>
+    </div>
+  </div>
+
+  <div id="encantamento" class="magia-content">
+    <div class="card">
+      <h3>Encantamento — A Inscrição</h3>
+      <p>O caminho do <strong>gravar</strong>. Encantamento escreve a mana em objetos, símbolos, contratos. É magia lenta, paciente, permanente. Uma espada encantada hoje ainda corta amanhã — e em mil anos.</p>
+      <p style="margin-top:10px"><strong>Atributo principal:</strong> Fé · <strong>Custo base:</strong> 5 mana/ritual menor · <strong>Risco:</strong> inscrição corrompida (efeito reverte ou afeta o conjurador)</p>
+    </div>
+    <div class="card">
+      <h3>Seus Encantamentos Ativos</h3>
+      <table class="dynamic-table" id="tbl-enc">
+        <thead><tr><th>Objeto</th><th>Custo</th><th>Duração</th><th>Efeito</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <button class="btn btn-small" onclick="addRow('tbl-enc',4)">+ Adicionar</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CLASSES ============ -->
+<section id="classes">
+  <h2>CLASSES</h2>
+  <p style="margin-bottom:20px;color:#a8957a;font-style:italic">Cinco classes. Oito arquétipos universais. Subclasses específicas por caminho mágico.</p>
+
+  <div class="classe-card">
+    <h3>Guerreiro</h3>
+    <span class="tag">FOR / VIG</span><span class="tag">Combate Direto</span>
+    <p style="margin-top:10px">Mestre do aço e do corpo. O guerreiro não despreza magia — usa-a como tempero, não como prato principal. Sua força vem da disciplina, da repetição, do calo nas mãos.</p>
+    <p><strong>Arquétipos:</strong> Sentinela, Berserker, Duelista, Capitão</p>
+    <div class="exemplo">
+      <strong>Exemplo:</strong> Kael, um guerreiro Korvathi, encara três bandidos sozinho. Em vez de conjurar, ele crava a espada no chão de pedra e ativa um encantamento de fogo gravado na lâmina. O calor irradia, os bandidos recuam, e ele avança. <em>Custo: 3 mana. Resultado: vantagem em intimidação + área de 3m com dano leve.</em>
+    </div>
+  </div>
+
+  <div class="classe-card">
+    <h3>Conjurador</h3>
+    <span class="tag">INT / ESP</span><span class="tag">Magia Pura</span>
+    <p style="margin-top:10px">O estudioso da linguagem. Domina os três caminhos em teoria, mas geralmente especializa-se em um. Lê tudo, anota tudo, desconfia de tudo.</p>
+    <p><strong>Arquétipos:</strong> Erudito, Elementarista, Ilusionista, Ritualista</p>
+    <div class="exemplo">
+      <strong>Exemplo:</strong> Lyra, uma conjuradora Serelith, é cercada em um beco. Ela fecha os olhos (Phewinnd: <em>Escuta dos Passos</em>, 2 mana) e mapeia onde cada inimigo está pelo som. Então solta um Conjuro de névoa densa (4 mana) e escapa enquanto eles tropeçam uns nos outros.
+    </div>
+  </div>
+
+  <div class="classe-card">
+    <h3>Caçador</h3>
+    <span class="tag">DES / PER</span><span class="tag">Sobrevivência</span>
+    <p style="margin-top:10px">Quem caminha entre o selvagem e o civilizado. Lê rastros, antecipa emboscadas, atira primeiro. Tem fé na intuição, não em livros.</p>
+    <p><strong>Arquétipos:</strong> Batedor, Atirador, Domador, Assassino</p>
+    <div class="exemplo">
+      <strong>Exemplo:</strong> Toran, um caçador Orosthai, persegue uma criatura na floresta há três dias. Em vez de gastar mana atacando, ele encanta suas flechas (Encantamento, 5 mana, ritual noturno) para nunca errar o alvo marcado. Na manhã seguinte, um único tiro resolve.
+    </div>
+  </div>
+
+  <div class="classe-card">
+    <h3>Diplomata</h3>
+    <span class="tag">CAR / INT</span><span class="tag">Social / Político</span>
+    <p style="margin-top:10px">A guerra começa muito antes da primeira espada. O diplomata sabe disso. Manipula contratos, alianças, segredos. Magia social é sua arma.</p>
+    <p><strong>Arquétipos:</strong> Cortesão, Espião, Mercador, Orador</p>
+    <div class="exemplo">
+      <strong>Exemplo:</strong> Vessa, uma diplomata Faelkin, negocia com um lorde Korvathi hostil. Usa Phewinnd de <em>Leitura de Intenção</em> (3 mana) durante a conversa — sente quando ele mente. Não acusa: redireciona o assunto, oferece um acordo melhor, sai com o tratado assinado.
+    </div>
+  </div>
+
+  <div class="classe-card">
+    <h3>Andarilho</h3>
+    <span class="tag">VIG / SOR</span><span class="tag">Coringa</span>
+    <p style="margin-top:10px">Sem mestre, sem guilda, sem mapa. O andarilho coleciona fragmentos: um truque aqui, um encantamento ali, uma história em cada cidade. Versátil, imprevisível, raramente respeitado — até ser necessário.</p>
+    <p><strong>Arquétipos:</strong> Vagante, Eremita, Mercenário, Profeta</p>
+    <div class="exemplo">
+      <strong>Exemplo:</strong> Ren, um andarilho Cinzath, entra numa taberna onde ninguém sabe seu nome. Em uma hora, sabe quem deve dinheiro a quem, qual mercador esconde contrabando, e em qual quarto fica o viajante rico. Não usou magia nenhuma — só Per e Car. A mana fica guardada para quando importar.
+    </div>
+  </div>
+</section>
+
+<!-- ============ RAÇAS ============ -->
+<section id="racas">
+  <h2>RAÇAS DE CALON</h2>
+
+  <div class="raca-card"><h3>Valdrim — Humanos das Planícies</h3>
+    <p>Generalistas, adaptáveis, fundadores das academias. Aprendem qualquer caminho mágico com facilidade.</p>
+    <div class="raca-stats"><span><strong>Mana:</strong> 10</span><span><strong>Bônus:</strong> −1 em qualquer magia</span><span><strong>Traço:</strong> Versátil</span></div>
+  </div>
+  <div class="raca-card"><h3>Korvathi — Anões Vulcânicos</h3>
+    <p>Forjadores nascidos em Kal'Vorath. Desprezam magia fria, dominam metal e fogo.</p>
+    <div class="raca-stats"><span><strong>Mana:</strong> 8</span><span><strong>Bônus:</strong> −2 Encantamento (fogo/metal)</span><span><strong>Traço:</strong> Sangue de Forja</span></div>
+  </div>
+  <div class="raca-card"><h3>Serelith — Elfos da Névoa</h3>
+    <p>Contemplativos. Ouvem a mana antes de manipulá-la. Mestres de Phewinnd.</p>
+    <div class="raca-stats"><span><strong>Mana:</strong> 12</span><span><strong>Bônus:</strong> −2 Phewinnd (percepção/ilusão)</span><span><strong>Traço:</strong> Olhar Velado</span></div>
+  </div>
+  <div class="raca-card"><h3>Drakorim — Meio-Dragões</h3>
+    <p>Linhagens pactuadas com dragões primordiais. Conjuros elementais instintivos.</p>
+    <div class="raca-stats"><span><strong>Mana:</strong> 9</span><span><strong>Bônus:</strong> −3 Conjuro elemental</span><span><strong>Traço:</strong> Sopro Ancestral</span></div>
+  </div>
+  <div class="raca-card"><h3>Umbralith — Nascidos da Sombra</h3>
+    <p>Surgidos nas Cavernas de Neth. Absorvem mana ambiente em vez de gerá-la.</p>
+    <div class="raca-stats"><span><strong>Mana:</strong> 6</span><span><strong>Bônus:</strong> −2 magias de sombra/sigilo</span><span><strong>Traço:</strong> Absorção Umbral</span></div>
+  </div>
+  <div class="raca-card"><h3>Thalassari — Povo do Mar</h3>
+    <p>Civilização submersa no Arquipélago de Vehn. Coletivistas, guiados por marés.</p>
+    <div class="raca-stats"><span><strong>Mana:</strong> 11</span><span><strong>Bônus:</strong> −2 Conjuro (água/cura)</span><span><strong>Traço:</strong> Anfíbio</span></div>
+  </div>
+  <div class="raca-card"><h3>Petranos — Gigantes de Pedra</h3>
+    <p>Descendentes dos Colossos. Lentos, reverenciados, guardiões de lugares sagrados.</p>
+    <div class="raca-stats"><span><strong>Mana:</strong> 7</span><span><strong>Bônus:</strong> −3 Encantamento (proteção)</span><span><strong>Traço:</strong> Pele de Rocha</span></div>
+  </div>
+  <div class="raca-card"><h3>Faelkin — Feéricos Errantes</h3>
+    <p>Viajantes do Véu. Incapazes de mentir diretamente, mestres em meias-verdades.</p>
+    <div class="raca-stats"><span><strong>Mana:</strong> 10</span><span><strong>Bônus:</strong> −2 Phewinnd (charme/ilusão)</span><span><strong>Traço:</strong> Passo do Véu</span></div>
+  </div>
+  <div class="raca-card"><h3>Orosthai — Nômades do Vento</h3>
+    <p>Tribos das Estepes Altas. Cavaleiros, leitores de presságios.</p>
+    <div class="raca-stats"><span><strong>Mana:</strong> 9</span><span><strong>Bônus:</strong> −2 Conjuro (vento/som)</span><span><strong>Traço:</strong> Pulmões das Alturas</span></div>
+  </div>
+  <div class="raca-card"><h3>Cinzath — Renascidos das Cinzas</h3>
+    <p>Sobreviventes do Cataclismo de Ashen. Instáveis, poderosos, marcados.</p>
+    <div class="raca-stats"><span><strong>Mana:</strong> 8 (+1d6)</span><span><strong>Bônus:</strong> troca HP por mana 1:1</span><span><strong>Traço:</strong> Pulso Instável</span></div>
+  </div>
+</section>
+
+<!-- ============ GUILDAS ============ -->
+<section id="guildas">
+  <h2>AS SETE GUILDAS</h2>
+  <p style="margin-bottom:20px;color:#a8957a;font-style:italic">Definem o poder político e social dos 12 reinos.</p>
+  <div class="card"><h3>Ordem do Verbo</h3><p>Acadêmicos e linguistas da mana. Controlam o ensino formal. Conservadores, lentos, influentes.</p></div>
+  <div class="card"><h3>Forja dos Pactos</h3><p>Encantadores e contratualistas. Toda inscrição mágica oficial passa por eles.</p></div>
+  <div class="card"><h3>Olhos do Véu</h3><p>Espiões, batedores, mestres de Phewinnd. Trabalham para quem pagar — supostamente.</p></div>
+  <div class="card"><h3>Punho de Brasa</h3><p>Mercenários e conjuradores de combate. Brutais, eficientes, sem cerimônia.</p></div>
+  <div class="card"><h3>Mãos Silenciosas</h3><p>Curandeiros e ritualistas. Neutralidade declarada — atendem qualquer um.</p></div>
+  <div class="card"><h3>Companhia das Marés</h3><p>Mercadores, navegadores, contrabandistas. Controlam as rotas comerciais.</p></div>
+  <div class="card"><h3>Concílio das Cinzas</h3><p>Suspeitos. Estudam o Cataclismo. Alguns dizem que querem repeti-lo.</p></div>
+</section>
+
+<!-- ============ COMO JOGAR ============ -->
+<section id="exemplos">
+  <h2>COMO JOGAR</h2>
+
+  <div class="card">
+    <h3>Estrutura de um Turno</h3>
+    <p>1. <strong>Declare</strong> sua intenção em palavras simples — não a mecânica, a ação.<br>
+    2. <strong>O Mestre</strong> pede o teste apropriado (atributo + perícia + dado).<br>
+    3. <strong>Role</strong> e narre o resultado em conjunto.<br>
+    4. <strong>Custos de mana</strong> são pagos antes da rolagem; se falhar, a mana se vai mesmo assim.</p>
+  </div>
+
+  <div class="card">
+    <h3>Exemplo Completo de Cena</h3>
+    <p style="color:#a8957a"><em>Cena: três personagens invadem uma cripta encantada em busca de um artefato.</em></p>
+
+    <div class="exemplo">
+      <strong>Mestre:</strong> A porta de pedra está selada com um sigilo brilhando em azul. Vocês sentem o peso do encantamento — antigo, mas firme.
+    </div>
+    <div class="exemplo">
+      <strong>Lyra (Conjuradora Serelith):</strong> Vou usar <em>Escuta do Sigilo</em> (Phewinnd, 2 mana) — quero saber que tipo de encantamento é.<br>
+      <strong>Mestre:</strong> Role Esp + Conhecimento Arcano.<br>
+      <strong>Lyra:</strong> 14! <br>
+      <strong>Mestre:</strong> É um selo de palavra. Precisa ser falado, não quebrado.
+    </div>
+    <div class="exemplo">
+      <strong>Kael (Guerreiro Korvathi):</strong> Eu não falo elfo antigo. Posso só arrombar?<br>
+      <strong>Mestre:</strong> Pode tentar — Força. Mas o sigilo vai reagir.<br>
+      <strong>Vessa (Diplomata Faelkin):</strong> Espera. Lyra, você ouviu a palavra?<br>
+      <strong>Lyra:</strong> Não inteira. Só o ritmo.<br>
+      <strong>Vessa:</strong> Suficiente. Vou tentar reconstruir cantando — Car + Performance.<br>
+      <strong>Mestre:</strong> 18. A porta range, hesita, e abre.
+    </div>
+    <p style="margin-top:14px"><strong>Lição:</strong> Magia em Faradey não é só "lançar feitiço". É escutar, interpretar, improvisar. Três jogadores, três caminhos, uma porta aberta sem violência.</p>
+  </div>
+
+  <div class="card">
+    <h3>Gastando Mana com Inteligência</h3>
+    <ul style="margin-left:20px">
+      <li><strong>Não gaste em tudo:</strong> mana regenera devagar (1 por descanso curto, total por descanso longo).</li>
+      <li><strong>Combine caminhos:</strong> Phewinnd para entender, Conjuro para agir, Encantamento para durar.</li>
+      <li><strong>Risco vs custo:</strong> magia barata falha mais. Magia cara raramente falha, mas esgota.</li>
+      <li><strong>Use sua raça:</strong> bônus de custo são significativos — jogue de acordo com sua identidade.</li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<div class="actions">
+  <button class="btn" onclick="salvar()">💾 Salvar</button>
+  <button class="btn" onclick="carregar()">📂 Carregar</button>
+  <button class="btn" onclick="exportar()">⬇ Exportar JSON</button>
+</div>
+
+<script>
+function show(id, btn){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+function showMagia(id, btn){
+  document.querySelectorAll('.magia-content').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.magia-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function addRow(tableId, cols){
+  const tbody = document.querySelector('#'+tableId+' tbody');
+  const tr = document.createElement('tr');
+  let html = '';
+  for(let i=0;i<cols;i++) html += '<td><input type="text"></td>';
+  html += '<td><button class="btn btn-small btn-danger" onclick="this.closest(\'tr\').remove()">✕</button></td>';
+  tr.innerHTML = html;
+  tbody.appendChild(tr);
+}
+function coletar(){
+  const dados = {campos:{}, tabelas:{}};
+  document.querySelectorAll('[data-f]').forEach(el=>{
+    dados.campos[el.dataset.f] = el.value;
+  });
+  ['tbl-ataques','tbl-pericias','tbl-phewinnd','tbl-conjuro','tbl-enc'].forEach(id=>{
+    const rows = [];
+    document.querySelectorAll('#'+id+' tbody tr').forEach(tr=>{
+      const vals = [...tr.querySelectorAll('input')].map(i=>i.value);
+      rows.push(vals);
+    });
+    dados.tabelas[id] = rows;
+  });
+  return dados;
+}
+function aplicar(dados){
+  Object.entries(dados.campos||{}).forEach(([k,v])=>{
+    const el = document.querySelector('[data-f="'+k+'"]');
+    if(el) el.value = v;
+  });
+  Object.entries(dados.tabelas||{}).forEach(([id,rows])=>{
+    const tbody = document.querySelector('#'+id+' tbody');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    rows.forEach(vals=>{
+      addRow(id, vals.length);
+      const tr = tbody.lastElementChild;
+      const inputs = tr.querySelectorAll('input');
+      vals.forEach((v,i)=>{ if(inputs[i]) inputs[i].value = v; });
+    });
+  });
+}
+function salvar(){
+  localStorage.setItem('faradey', JSON.stringify(coletar()));
+  alert('Ficha salva no navegador!');
+}
+function carregar(){
+  const d = localStorage.getItem('faradey');
+  if(!d){ alert('Nenhuma ficha salva.'); return; }
+  aplicar(JSON.parse(d));
+  alert('Ficha carregada!');
+}
+function exportar(){
+  const blob = new Blob([JSON.stringify(coletar(),null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'faradey-ficha.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+// adiciona 1 linha inicial em cada tabela
+window.addEventListener('load', ()=>{
+  addRow('tbl-ataques',5);
+  addRow('tbl-pericias',3);
+  addRow('tbl-phewinnd',4);
+  addRow('tbl-conjuro',4);
+  addRow('tbl-enc',4);
+});
+</script>
+</body>
+</html>
